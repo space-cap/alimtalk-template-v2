@@ -67,8 +67,13 @@ const ChatPanel = ({ conversation, onSendMessage, isLoading }) => {
             ))}
             {isLoading && (
               <div className="message assistant">
-                <div className="loading">
-                  템플릿을 생성하고 있습니다...
+                <div className="typing-animation">
+                  <span>템플릿을 생성하고 있습니다</span>
+                  <div className="typing-dots">
+                    <div className="typing-dot"></div>
+                    <div className="typing-dot"></div>
+                    <div className="typing-dot"></div>
+                  </div>
                 </div>
               </div>
             )}
