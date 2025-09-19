@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // Use proxy in development, direct API in production
-const API_BASE_URL = import.meta.env.DEV ? '/api' : 'http://3.34.43.149:8000'
+const API_BASE_URL = import.meta.env.DEV ? '/api' : 'http://13.124.130.254:8000'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
