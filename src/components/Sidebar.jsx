@@ -4,7 +4,8 @@ const Sidebar = ({
   conversations,
   activeConversation,
   onSelectConversation,
-  onNewConversation
+  onNewConversation,
+  onDeleteConversation
 }) => {
   return (
     <div className="sidebar">
@@ -37,9 +38,27 @@ const Sidebar = ({
               className={`conversation-item ${
                 activeConversation?.id === conversation.id ? 'active' : ''
               }`}
-              onClick={() => onSelectConversation(conversation)}
             >
-              {conversation.title}
+              <div
+                className="conversation-content"
+                onClick={() => onSelectConversation(conversation)}
+              >
+                {conversation.title}
+              </div>
+              <button
+                className="conversation-delete"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (window.confirm('이 대화를 삭제하시겠습니까?')) {
+                    onDeleteConversation(conversation.id)
+                  }
+                }}
+                title="대화 삭제"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+                  <path d="M1 3.5L3.5 1L7 4.5L10.5 1L13 3.5L9.5 7L13 10.5L10.5 13L7 9.5L3.5 13L1 10.5L4.5 7L1 3.5Z"/>
+                </svg>
+              </button>
             </div>
           ))
         )}

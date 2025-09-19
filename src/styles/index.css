@@ -71,10 +71,47 @@ body {
   padding: 12px;
   margin-bottom: 4px;
   border-radius: 8px;
-  cursor: pointer;
   transition: background-color 0.2s;
   font-size: 14px;
   color: #b5b5b5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.conversation-content {
+  flex: 1;
+  cursor: pointer;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversation-delete {
+  background: transparent;
+  border: none;
+  color: #7a7a7a;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  opacity: 0;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.conversation-item:hover .conversation-delete {
+  opacity: 1;
+}
+
+.conversation-delete:hover {
+  background: #4a4a4a;
+  color: #ff6b6b;
 }
 
 .conversation-item:hover {

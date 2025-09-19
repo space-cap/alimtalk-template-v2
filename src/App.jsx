@@ -4,32 +4,100 @@ import ChatPanel from './components/ChatPanel'
 import TemplatePanel from './components/TemplatePanel'
 import { generateTemplate } from './services/api'
 
+const STORAGE_KEY = 'alimtalk_conversations'
+const MAX_CONVERSATIONS = 10
+
 function App() {
   const [conversations, setConversations] = useState([])
   const [activeConversation, setActiveConversation] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [currentTemplate, setCurrentTemplate] = useState(null)
 
+  // 로컬스토리지에서 대화 히스토리 불러오기
+  const loadConversations = () => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        // Date 객체 복원 및 데이터 검증
+        const restored = parsed.map(conv => ({
+          ...conv,
+          messages: (conv.messages || []).map(msg => ({
+            ...msg,
+            timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date()
+          })),
+          createdAt: conv.createdAt ? new Date(conv.createdAt) : new Date()
+        }))
+        return restored
+      }
+    } catch (error) {
+      console.error('대화 히스토리 로드 실패:', error)
+    }
+    return []
+  }
+
+  // 로컬스토리지에 대화 히스토리 저장
+  const saveConversations = (convs) => {
+    try {
+      // 최대 개수 제한
+      const limited = convs.slice(0, MAX_CONVERSATIONS)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(limited))
+    } catch (error) {
+      console.error('대화 히스토리 저장 실패:', error)
+    }
+  }
+
   const createNewConversation = () => {
     const newConversation = {
       id: Date.now(),
       title: '새 대화',
       messages: [],
-      template: null
+      template: null,
+      createdAt: new Date()
     }
-    setConversations(prev => [newConversation, ...prev])
+    setConversations(prev => {
+      const updated = [newConversation, ...prev].slice(0, MAX_CONVERSATIONS)
+      saveConversations(updated)
+      return updated
+    })
     setActiveConversation(newConversation)
     setCurrentTemplate(null)
   }
 
+  const deleteConversation = (conversationId) => {
+    setConversations(prev => {
+      const updated = prev.filter(conv => conv.id !== conversationId)
+      saveConversations(updated)
+      return updated
+    })
+
+    // 삭제된 대화가 현재 활성 대화인 경우 처리
+    if (activeConversation?.id === conversationId) {
+      setActiveConversation(null)
+      setCurrentTemplate(null)
+    }
+  }
+
   const updateConversationTitle = (conversationId, title) => {
-    setConversations(prev =>
-      prev.map(conv =>
+    const newTitle = title.slice(0, 30) + (title.length > 30 ? '...' : '')
+
+    setConversations(prev => {
+      const updated = prev.map(conv =>
         conv.id === conversationId
-          ? { ...conv, title: title.slice(0, 30) + (title.length > 30 ? '...' : '') }
+          ? { ...conv, title: newTitle }
           : conv
       )
-    )
+      saveConversations(updated)
+      return updated
+    })
+
+    // 활성 대화의 제목도 업데이트
+    if (activeConversation?.id === conversationId) {
+      setActiveConversation(prev => ({
+        ...prev,
+        title: newTitle
+      }))
+    }
   }
 
   const sendMessage = async (message) => {
@@ -48,15 +116,23 @@ function App() {
       messages: [...activeConversation.messages, userMessage]
     }
 
-    setActiveConversation(updatedConversation)
-    setConversations(prev =>
-      prev.map(conv => conv.id === activeConversation.id ? updatedConversation : conv)
-    )
-
     // Update title if first message
+    let conversationWithTitle = updatedConversation
     if (activeConversation.messages.length === 0) {
-      updateConversationTitle(activeConversation.id, message)
+      console.log('첫 메시지로 제목 업데이트:', message)
+      const newTitle = message.slice(0, 30) + (message.length > 30 ? '...' : '')
+      conversationWithTitle = {
+        ...updatedConversation,
+        title: newTitle
+      }
     }
+
+    setActiveConversation(conversationWithTitle)
+    setConversations(prev => {
+      const updated = prev.map(conv => conv.id === activeConversation.id ? conversationWithTitle : conv)
+      saveConversations(updated)
+      return updated
+    })
 
     setIsLoading(true)
 
@@ -77,15 +153,17 @@ function App() {
       }
 
       const finalConversation = {
-        ...updatedConversation,
-        messages: [...updatedConversation.messages, assistantMessage],
+        ...conversationWithTitle,
+        messages: [...conversationWithTitle.messages, assistantMessage],
         template: template
       }
 
       setActiveConversation(finalConversation)
-      setConversations(prev =>
-        prev.map(conv => conv.id === activeConversation.id ? finalConversation : conv)
-      )
+      setConversations(prev => {
+        const updated = prev.map(conv => conv.id === activeConversation.id ? finalConversation : conv)
+        saveConversations(updated)
+        return updated
+      })
       setCurrentTemplate(template)
 
     } catch (error) {
@@ -99,14 +177,16 @@ function App() {
       }
 
       const errorConversation = {
-        ...updatedConversation,
-        messages: [...updatedConversation.messages, errorMessage]
+        ...conversationWithTitle,
+        messages: [...conversationWithTitle.messages, errorMessage]
       }
 
       setActiveConversation(errorConversation)
-      setConversations(prev =>
-        prev.map(conv => conv.id === activeConversation.id ? errorConversation : conv)
-      )
+      setConversations(prev => {
+        const updated = prev.map(conv => conv.id === activeConversation.id ? errorConversation : conv)
+        saveConversations(updated)
+        return updated
+      })
     } finally {
       setIsLoading(false)
     }
@@ -117,10 +197,27 @@ function App() {
     setCurrentTemplate(conversation.template)
   }
 
-  // Initialize with first conversation
+  // 초기화: 로컬스토리지에서 대화 히스토리 로드
   useEffect(() => {
-    if (conversations.length === 0) {
-      createNewConversation()
+    const savedConversations = loadConversations()
+    if (savedConversations.length > 0) {
+      setConversations(savedConversations)
+      // 가장 최근 대화를 활성 대화로 설정
+      setActiveConversation(savedConversations[0])
+      setCurrentTemplate(savedConversations[0].template)
+    } else {
+      // 저장된 대화가 없으면 새 대화 생성
+      const newConversation = {
+        id: Date.now(),
+        title: '새 대화',
+        messages: [],
+        template: null,
+        createdAt: new Date()
+      }
+      setConversations([newConversation])
+      setActiveConversation(newConversation)
+      setCurrentTemplate(null)
+      saveConversations([newConversation])
     }
   }, [])
 
@@ -131,6 +228,7 @@ function App() {
         activeConversation={activeConversation}
         onSelectConversation={selectConversation}
         onNewConversation={createNewConversation}
+        onDeleteConversation={deleteConversation}
       />
       <div className="main-content">
         <ChatPanel
