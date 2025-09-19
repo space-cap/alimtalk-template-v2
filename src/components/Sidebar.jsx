@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ThemeSelector from './ThemeSelector'
 
 const Sidebar = ({
   conversations,
@@ -62,6 +63,10 @@ const Sidebar = ({
             </div>
           ))
         )}
+      </div>
+
+      <div className="sidebar-footer">
+        <ThemeSelector />
       </div>
     </div>
   )
