@@ -134,16 +134,31 @@ function App() {
       return updated
     })
 
+    console.log('⏳ 로딩 상태 시작')
     setIsLoading(true)
 
     try {
-      const template = await generateTemplate({
+      const requestPayload = {
         userId: 123,
         requestContent: message,
         conversationContext: activeConversation.messages.length > 0
           ? activeConversation.messages.map(m => m.content).join('\n')
           : 'hi'
-      })
+      }
+
+      console.log('🎯 템플릿 생성 요청 시작')
+      console.log('👤 사용자 메시지:', message)
+      console.log('📋 대화 컨텍스트:', requestPayload.conversationContext)
+      console.log('📦 전체 요청 데이터:', requestPayload)
+
+      const template = await generateTemplate(requestPayload)
+
+      console.log('🎉 템플릿 생성 성공!')
+      console.log('📋 생성된 템플릿 ID:', template.id)
+      console.log('📝 템플릿 제목:', template.title)
+      console.log('📄 템플릿 내용 미리보기:', template.content.substring(0, 50) + '...')
+      console.log('🏷️ 변수 개수:', template.variables?.length || 0)
+      console.log('🔘 버튼 개수:', template.buttons?.length || 0)
 
       const assistantMessage = {
         id: Date.now() + 1,
@@ -158,6 +173,7 @@ function App() {
         template: template
       }
 
+      console.log('💾 대화 상태 업데이트 중...')
       setActiveConversation(finalConversation)
       setConversations(prev => {
         const updated = prev.map(conv => conv.id === activeConversation.id ? finalConversation : conv)
@@ -165,9 +181,12 @@ function App() {
         return updated
       })
       setCurrentTemplate(template)
+      console.log('✅ 모든 상태 업데이트 완료')
 
     } catch (error) {
-      console.error('Template generation failed:', error)
+      console.log('💥 템플릿 생성 실패!')
+      console.error('❌ Error Details:', error)
+      console.log('📤 실패한 요청:', message)
 
       const errorMessage = {
         id: Date.now() + 1,
@@ -181,13 +200,16 @@ function App() {
         messages: [...conversationWithTitle.messages, errorMessage]
       }
 
+      console.log('🔄 에러 상태로 대화 업데이트 중...')
       setActiveConversation(errorConversation)
       setConversations(prev => {
         const updated = prev.map(conv => conv.id === activeConversation.id ? errorConversation : conv)
         saveConversations(updated)
         return updated
       })
+      console.log('❌ 에러 상태 업데이트 완료')
     } finally {
+      console.log('⏹️ 로딩 상태 종료')
       setIsLoading(false)
     }
   }

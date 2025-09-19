@@ -83,15 +83,51 @@ const mockTemplateData = {
 
 export const generateTemplate = async (requestData) => {
   try {
-    console.log('API 요청 시도:', requestData)
+    console.log('🚀 API 요청 시작')
+    console.log('📤 Request URL:', `${API_BASE_URL}/ai/templates`)
+    console.log('📤 Request Headers:', {
+      'Content-Type': 'application/json',
+      'accept': 'application/json'
+    })
+    console.log('📤 Request Body:', JSON.stringify(requestData, null, 2))
+
+    const startTime = performance.now()
     const response = await api.post('/ai/templates', requestData)
+    const endTime = performance.now()
+
+    console.log('✅ API 응답 성공')
+    console.log('📥 Response Status:', response.status)
+    console.log('📥 Response Headers:', response.headers)
+    console.log('📥 Response Data:', JSON.stringify(response.data, null, 2))
+    console.log('⏱️ Response Time:', `${(endTime - startTime).toFixed(2)}ms`)
+
     return response.data
   } catch (error) {
-    console.error('API Error:', error)
-    console.warn('API 서버에 연결할 수 없어 모의 데이터를 사용합니다.')
+    console.log('❌ API 요청 실패')
+    console.log('📤 Failed Request URL:', `${API_BASE_URL}/ai/templates`)
+    console.log('📤 Failed Request Body:', JSON.stringify(requestData, null, 2))
+
+    if (error.response) {
+      // 서버가 응답했지만 에러 상태코드
+      console.log('📥 Error Response Status:', error.response.status)
+      console.log('📥 Error Response Headers:', error.response.headers)
+      console.log('📥 Error Response Data:', JSON.stringify(error.response.data, null, 2))
+    } else if (error.request) {
+      // 요청은 보냈지만 응답이 없음
+      console.log('📡 No Response Received')
+      console.log('📡 Request Details:', error.request)
+    } else {
+      // 요청 설정 중 에러
+      console.log('⚙️ Request Setup Error:', error.message)
+    }
+
+    console.log('🔧 Full Error Object:', error)
+    console.warn('🎭 API 서버에 연결할 수 없어 모의 데이터를 사용합니다.')
 
     // API 실패 시 모의 데이터 반환
+    const mockStartTime = performance.now()
     await new Promise(resolve => setTimeout(resolve, 1000)) // 실제 API 호출처럼 지연 시뮬레이션
+    const mockEndTime = performance.now()
 
     // 요청 내용에 따라 템플릿 제목과 내용을 동적으로 생성
     const customTemplate = {
@@ -102,6 +138,10 @@ export const generateTemplate = async (requestData) => {
              '알림톡 템플릿',
       id: Date.now() // 고유 ID 생성
     }
+
+    console.log('🎭 Mock Response Generated')
+    console.log('📥 Mock Response Data:', JSON.stringify(customTemplate, null, 2))
+    console.log('⏱️ Mock Response Time:', `${(mockEndTime - mockStartTime).toFixed(2)}ms`)
 
     return customTemplate
   }
