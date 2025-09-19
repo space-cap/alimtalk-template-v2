@@ -1,0 +1,378 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #1a1a1a;
+  color: #e5e5e5;
+  overflow: hidden;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+  background-color: #1a1a1a;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: #2a2a2a;
+  border-right: 1px solid #3a3a3a;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.sidebar-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e5e5e5;
+}
+
+.new-chat-btn {
+  background: #3a3a3a;
+  border: none;
+  color: #e5e5e5;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.new-chat-btn:hover {
+  background: #4a4a4a;
+}
+
+.conversation-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.conversation-item {
+  padding: 12px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
+  color: #b5b5b5;
+}
+
+.conversation-item:hover {
+  background-color: #3a3a3a;
+}
+
+.conversation-item.active {
+  background-color: #4a4a4a;
+  color: #e5e5e5;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  background-color: #1a1a1a;
+}
+
+.chat-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #3a3a3a;
+}
+
+.chat-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #3a3a3a;
+  background-color: #2a2a2a;
+}
+
+.chat-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e5e5e5;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.message {
+  max-width: 80%;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.message.user {
+  align-self: flex-end;
+  background-color: #3a3a3a;
+  color: #e5e5e5;
+}
+
+.message.assistant {
+  align-self: flex-start;
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  color: #e5e5e5;
+}
+
+.chat-input-container {
+  padding: 24px;
+  border-top: 1px solid #3a3a3a;
+  background-color: #1a1a1a;
+}
+
+.chat-input-wrapper {
+  position: relative;
+  display: flex;
+  gap: 12px;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 16px;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  background-color: #2a2a2a;
+  color: #e5e5e5;
+  font-size: 14px;
+  resize: none;
+  min-height: 56px;
+  max-height: 200px;
+  outline: none;
+}
+
+.chat-input:focus {
+  border-color: #5a5a5a;
+}
+
+.chat-input::placeholder {
+  color: #7a7a7a;
+}
+
+.send-btn {
+  background: #3a3a3a;
+  border: none;
+  color: #e5e5e5;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.send-btn:hover:not(:disabled) {
+  background: #4a4a4a;
+}
+
+.send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.template-panel {
+  width: 400px;
+  background-color: #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.template-header {
+  margin-bottom: 24px;
+}
+
+.template-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #e5e5e5;
+}
+
+.template-subtitle {
+  font-size: 14px;
+  color: #b5b5b5;
+}
+
+.template-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.template-preview {
+  background-color: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.template-preview-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #e5e5e5;
+}
+
+.template-preview-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #e5e5e5;
+  white-space: pre-wrap;
+  margin-bottom: 12px;
+}
+
+.template-variables {
+  margin-top: 16px;
+}
+
+.template-variables-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #e5e5e5;
+}
+
+.variable-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.variable-label {
+  font-size: 12px;
+  color: #b5b5b5;
+}
+
+.variable-input {
+  padding: 8px 12px;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  background-color: #1a1a1a;
+  color: #e5e5e5;
+  font-size: 14px;
+  outline: none;
+}
+
+.variable-input:focus {
+  border-color: #5a5a5a;
+}
+
+.template-buttons {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #3a3a3a;
+}
+
+.template-button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 8px;
+  background-color: #3a3a3a;
+  border: 1px solid #4a4a4a;
+  border-radius: 8px;
+  color: #e5e5e5;
+  font-size: 14px;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color 0.2s;
+}
+
+.template-button:hover {
+  background-color: #4a4a4a;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #b5b5b5;
+}
+
+.error {
+  color: #ff6b6b;
+  padding: 12px;
+  background-color: #2a1a1a;
+  border: 1px solid #ff6b6b;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #7a7a7a;
+  text-align: center;
+  padding: 40px;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.empty-state-description {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.template-info {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+}
+
+.template-info-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #b5b5b5;
+  margin-bottom: 4px;
+}
+
+.template-info-content {
+  font-size: 14px;
+  color: #e5e5e5;
+}
